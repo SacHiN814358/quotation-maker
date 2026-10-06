@@ -1,9 +1,9 @@
-# Deepa Engineering - Quotation Maker
+# Quotation Maker
 
-A responsive Web & Mobile PWA application for automated fabrication rate quotation generation, customized for **Deepa Engineering**.
+A responsive Web & Mobile PWA application for automated fabrication rate quotation generation.
 
-🔗 **Live App (Netlify):** [https://merry-profiterole-e72b9a.netlify.app](https://merry-profiterole-e72b9a.netlify.app)  
-📂 **GitHub Repository:** [https://github.com/SacHiN814358/deepa-engineering-quotation](https://github.com/SacHiN814358/deepa-engineering-quotation)
+🔗 **Live App:** [https://sachin814358.github.io/quotation-maker/](https://sachin814358.github.io/quotation-maker/)  
+📂 **GitHub Repository:** [https://github.com/SacHiN814358/quotation-maker](https://github.com/SacHiN814358/quotation-maker)
 
 ---
 
