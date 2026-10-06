@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#1e3a8a">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>Deepa Engineering - Quotation Maker</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: #f1f5f9;
+      color: #0f172a;
+      padding: 20px;
+    }
+
+    /* Screen UI Header / Control Panel */
+    .app-toolbar {
+      max-width: 950px;
+      margin: 0 auto 20px auto;
+      background: #ffffff;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .toolbar-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1e3a8a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .btn-primary:hover { background: #1d4ed8; }
+
+    .btn-success {
+      background: #16a34a;
+      color: #ffffff;
+    }
+    .btn-success:hover { background: #15803d; }
+
+    .btn-secondary {
+      background: #e2e8f0;
+      color: #334155;
+    }
+    .btn-secondary:hover { background: #cbd5e1; }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #b91c1c;
+      padding: 4px 8px;
+      font-size: 12px;
+    }
+    .btn-danger:hover { background: #fecaca; }
+
+    /* The Main A4 Sheet Container */
+    .sheet-wrapper {
+      max-width: 950px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 30px 35px;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e2e8f0;
+    }
+
+    /* EXACT EXCEL QUOTATION FORMATTING */
+    .quote-box {
+      width: 100%;
+      border: 2px solid #000000;
+      background: #ffffff;
+    }
+
+    /* Grid Table styling matching screenshot */
+    table.quote-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    table.quote-table th, 
+    table.quote-table td {
+      border: 1px solid #000000;
+      padding: 5px 6px;
+      font-size: 13px;
+      vertical-align: middle;
+      color: #000000;
+    }
+
+    /* Header rows */
+    .header-gst-mob {
+      font-size: 11.5px;
+      font-weight: 700;
+      line-height: 1.4;
+      text-align: left;
+      padding-left: 8px !important;
+    }
+
+    table.quote-table td.header-title,
+    .header-title {
+      font-size: 30px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.5px !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      padding: 8px 6px !important;
+      text-transform: uppercase !important;
+      font-family: 'Segoe UI', Arial, sans-serif !important;
+    }
+
+    .header-meta {
+      font-size: 12px;
+      text-align: right;
+      padding-right: 8px !important;
+      line-height: 1.4;
+    }
+
+    .header-tagline {
+      font-size: 12.5px;
+      font-weight: 800;
+      text-align: center;
+      text-transform: uppercase;
+      padding: 4px !important;
+      letter-spacing: 0.5px;
+    }
+
+    .header-address {
+      font-size: 11.5px;
+      font-weight: 600;
+      text-align: center;
+      padding: 4px !important;
+    }
+
+    /* Client Details Row */
+    .client-row {
+      background: #fafafa;
+    }
+    .client-row td {
+      padding: 6px 10px !important;
+      font-size: 13px;
+    }
+
+    /* Table Column Headers */
+    .col-header {
+      font-weight: 800;
+      text-align: center;
+      background: #ffffff;
+      font-size: 12px;
+      text-transform: uppercase;
+      height: 28px;
+    }
+
+    /* Column Widths */
+    .col-sr { width: 7%; text-align: center; }
+    .col-part { width: 48%; }
+    .col-qty { width: 17%; text-align: center; }
+    .col-rate { width: 13%; text-align: right; }
+    .col-amt { width: 15%; text-align: right; }
+    .col-action { width: 45px; text-align: center; }
+
+    /* Inputs and textareas in table */
+    .tbl-input {
+      width: 100%;
+      border: 1px dashed transparent;
+      padding: 4px 6px;
+      font-size: 13px;
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+      color: #000;
+      transition: all 0.2s;
+    }
+    textarea.tbl-input {
+      resize: none;
+      overflow: hidden;
+      display: block;
+      line-height: 1.4;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .tbl-input:hover, .tbl-input:focus {
+      background: #f8fafc;
+      border-color: #94a3b8;
+      border-radius: 4px;
+    }
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    .text-left { text-align: left; }
+
+    .qty-flex {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .qty-flex input {
+      width: 50%;
+    }
+    .unit-input {
+      width: 50%;
+      font-size: 11.5px;
+      color: #334155;
+    }
+
+    /* Modal for Header Settings */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+    .modal-box {
+      background: #ffffff;
+      width: 100%;
+      max-width: 550px;
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 15px;
+      color: #1e293b;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .form-group {
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #475569;
+      margin-bottom: 4px;
+    }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    /* Terms footer (optional / clean) */
+    .optional-terms-box {
+      border-top: 1px solid #000;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      line-height: 1.5;
+    }
+
+    /* Mobile Responsiveness for Phones/Tablets */
+    @media screen and (max-width: 768px) {
+      body {
+        padding: 8px 4px;
+      }
+      .app-toolbar {
+        padding: 12px 10px;
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .toolbar-title {
+        font-size: 1rem;
+        justify-content: center;
+      }
+      .toolbar-actions {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+      }
+      .toolbar-actions .btn {
+        justify-content: center;
+        font-size: 12.5px;
+        padding: 8px 6px;
+      }
+      .sheet-wrapper {
+        padding: 8px 4px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .quote-box {
+        min-width: 680px; /* Maintains crystal clear layout on phone without squishing */
+      }
+    }
+
+    /* PRINT STYLING - A4 SHEET EXACT LAYOUT */
+    @media print {
+      body {
+        background: #ffffff !important;
+        padding: 0 !important;
+      }
+      .app-toolbar, .no-print, .col-action, .btn-action, .add-row-bar {
+        display: none !important;
+      }
+      .sheet-wrapper {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: visible !important;
+      }
+      .quote-box {
+        border: 1.5px solid #000000 !important;
+        min-width: 0 !important;
+        width: 100% !important;
+      }
+      table.quote-table th, table.quote-table td {
+        border: 1px solid #000000 !important;
+      }
+      .tbl-input {
+        border: none !important;
+        outline: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        padding: 1px 2px !important;
+        -webkit-appearance: none !important;
+      }
+      input::placeholder {
+        color: transparent !important;
+      }
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; 
+        margin: 0; 
+      }
+      @page {
+        size: A4 portrait;
+        margin: 8mm 10mm 8mm 10mm;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top App Navigation / Control Bar (Will NOT appear on PDF/Print) -->
+  <div class="app-toolbar no-print">
+    <div class="toolbar-title">
+      <span>📄 Deepa Engineering - Quotation Maker</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn btn-secondary" onclick="openSettingsModal()">
+        ⚙️ Header / Details Edit
+      </button>
+      <button class="btn btn-secondary" onclick="addRow()">
+        ➕ Add Row
+      </button>
+      <button class="btn btn-secondary" onclick="addMergedSpaceRow()">
+        🔲 Add Space Row
+      </button>
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ / 📄 Save as PDF
+      </button>
+      <button class="btn btn-success" onclick="exportToExcel()">
+        📊 Export to Excel
+      </button>
+    </div>
+  </div>
+
+  <!-- The Quotation Sheet (Matches exact Excel screenshot) -->
+  <div class="sheet-wrapper">
+    <div class="quote-box">
+      <table class="quote-table" id="quoteTable">
+        
+        <!-- HEADER ROW 1: GST, COMPANY NAME, DATE -->
+        <tr>
+          <td colspan="2" class="header-gst-mob" style="width: 27%;">
+            <div>GSTIN: <span id="dispGst">24BHLPG8009G1ZG</span></div>
+            <div>MOB NO: <span id="dispMob">8401859731, 8140249649</span></div>
+          </td>
+          <td colspan="3" class="header-title" style="width: 53%; font-size: 30px !important; font-weight: 800 !important; font-family: 'Segoe UI', Arial, sans-serif !important; letter-spacing: 0.5px !important; text-align: center; vertical-align: middle;" id="dispCompName">
+            DEEPA ENGINEERING
+          </td>
+          <td colspan="2" class="header-meta" style="width: 20%; text-align: center;">
+            <div style="white-space: nowrap;"><b>DATE:</b> <input type="text" id="quoteDate" class="tbl-input" style="width: 85px; display:inline; text-align: center;" value=""></div>
+          </td>
+          <td class="col-action no-print" style="width: 35px; border-left: none;"></td>
+        </tr>
+
+        <!-- HEADER ROW 2: TAGLINE / WORK DESCRIPTION -->
+        <tr>
+          <td colspan="7" class="header-tagline" id="dispTagline">
+            ALL TYPE OF FABRICATION & ERECTION WORK
+          </td>
+          <td class="col-action no-print"></td>
+        </tr>
+
+        <!-- HEADER ROW 3: ADDRESS (OPTIONAL) -->
+        <tr id="addressRow">
+          <td colspan="7" class="header-address" id="dispAddress">
+            Room no 7,Sureshbhai ki chawl,Maninagar,Chanod colony,GIDC,Vapi-396195
+          </td>
+          <td class="col-action no-print"></td>
+        </tr>
+
+        <!-- CLIENT / TO: ROW (Replaced M/s and removed Site/Location) -->
+        <tr class="client-row">
+          <td colspan="7">
+            <span style="font-weight: 800; font-size: 13.5px; margin-right: 5px;">TO:</span> 
+            <input type="text" id="clientName" class="tbl-input" style="display:inline; width: 92%; font-weight: 600; font-size: 13.5px;" placeholder="Enter Client / Party / Company Name...">
+          </td>
+          <td class="col-action no-print"></td>
+        </tr>
+
+        <!-- TABLE HEADERS -->
+        <tr style="background: #f8fafc;">
+          <th class="col-sr">SR.NO</th>
+          <th class="col-part" colspan="3">PARTICULARS</th>
+          <th class="col-qty">Qty/Kg/"/mtr</th>
+          <th class="col-rate">Rate (₹)</th>
+          <th class="col-amt">Amount (₹)</th>
+          <th class="col-action no-print">Del</th>
+        </tr>
+
+        <!-- DYNAMIC ITEMS BODY -->
+        <tbody id="itemsBody">
+          <!-- Rows will be injected by JavaScript -->
+        </tbody>
+
+      </table>
+
+      <!-- Optional Terms & Conditions (if needed, otherwise hidden) -->
+      <div id="termsContainer" class="optional-terms-box" style="display: none;">
+        <div id="dispTermsText"></div>
+      </div>
+
+    </div>
+
+    <!-- Quick Add Row bottom helper -->
+    <div class="no-print" style="margin-top: 15px; text-align: center; display: flex; justify-content: center; flex-wrap: wrap; gap: 12px;">
+      <button class="btn btn-secondary" onclick="addRow()">
+        ➕ Add New Item (नया आइटम जोड़ें)
+      </button>
+      <button class="btn btn-secondary" onclick="addMergedSpaceRow()" style="background: #f8fafc; border: 1.5px dashed #475569; color: #1e293b;">
+        🔲 Add Merged Space Row (मर्ज खाली स्पेस जोड़ें)
+      </button>
+    </div>
+  </div>
+
+  <!-- Header Details Edit Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        ⚙️ Company Header Settings
+      </div>
+      <div class="form-group">
+        <label>Company Name (कंपनी का नाम):</label>
+        <input type="text" id="editCompName" value="DEEPA ENGINEERING">
+      </div>
+      <div class="form-group">
+        <label>GSTIN:</label>
+        <input type="text" id="editGst" value="24BHLPG8009G1ZG">
+      </div>
+      <div class="form-group">
+        <label>Mobile Numbers:</label>
+        <input type="text" id="editMob" value="8401859731, 8140249649">
+      </div>
+      <div class="form-group">
+        <label>Work Type / Tagline:</label>
+        <input type="text" id="editTagline" value="ALL TYPE OF FABRICATION & ERECTION WORK">
+      </div>
+      <div class="form-group">
+        <label>Address (पता):</label>
+        <textarea id="editAddress" rows="2">Room no 7,Sureshbhai ki chawl,Maninagar,Chanod colony,GIDC,Vapi-396195</textarea>
+      </div>
+      <div class="form-group">
+        <label>Optional Terms (अगर कोई नियम लिखना चाहें, नहीं तो खाली रखें):</label>
+        <textarea id="editTerms" rows="2" placeholder="Leave empty for no terms..."></textarea>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 15px;">
+        <button class="btn btn-secondary" onclick="closeSettingsModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveSettings()">Save Changes (सेव करें)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SheetJS for Instant Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+  <script>
+    // Initial Items Data from your screenshot
+    let items = [
+      { particular: "M.S Fabrication and Fitting Per inch / Per mtr", qty: "1", rate: "110", amt: "" },
+      { particular: "Anchor Fastner Fitting Per nos", qty: "1 nos", rate: "60", amt: "" },
+      { particular: "M.S Plate cutting and fitting per kg", qty: "1kg", rate: "13", amt: "" },
+      { particular: "Patra Fitting Per Nos", qty: "1 nos", rate: "220", amt: "" }
+    ];
+
+    // Load saved settings or defaults
+    function loadCompanyProfile() {
+      const saved = localStorage.getItem("deepa_quote_profile");
+      let addressVal = "";
+      let p = {};
+      
+      if (saved) {
+        p = JSON.parse(saved);
+        addressVal = (p.address !== undefined) ? p.address : "Room no 7,Sureshbhai ki chawl,Maninagar,Chanod colony,GIDC,Vapi-396195";
+      } else {
+        addressVal = "Room no 7,Sureshbhai ki chawl,Maninagar,Chanod colony,GIDC,Vapi-396195";
+      }
+
+      document.getElementById("dispCompName").innerText = (p.name !== undefined && p.name !== "") ? p.name : "DEEPA ENGINEERING";
+      document.getElementById("dispGst").innerText = (p.gst !== undefined) ? p.gst : "24BHLPG8009G1ZG";
+      document.getElementById("dispMob").innerText = (p.mob !== undefined) ? p.mob : "8401859731, 8140249649";
+      document.getElementById("dispTagline").innerText = (p.tagline !== undefined) ? p.tagline : "ALL TYPE OF FABRICATION & ERECTION WORK";
+
+      document.getElementById("editCompName").value = (p.name !== undefined && p.name !== "") ? p.name : "DEEPA ENGINEERING";
+      document.getElementById("editGst").value = (p.gst !== undefined) ? p.gst : "24BHLPG8009G1ZG";
+      document.getElementById("editMob").value = (p.mob !== undefined) ? p.mob : "8401859731, 8140249649";
+      document.getElementById("editTagline").value = (p.tagline !== undefined) ? p.tagline : "ALL TYPE OF FABRICATION & ERECTION WORK";
+      document.getElementById("editAddress").value = addressVal;
+      document.getElementById("editTerms").value = p.terms || "";
+
+      // Optional Address Row: if empty, completely hide the row!
+      const addrRow = document.getElementById("addressRow");
+      if (addressVal && addressVal.trim() !== "") {
+        document.getElementById("dispAddress").innerText = addressVal.trim();
+        if (addrRow) addrRow.style.display = "table-row";
+      } else {
+        document.getElementById("dispAddress").innerText = "";
+        if (addrRow) addrRow.style.display = "none";
+      }
+
+      // Optional Terms
+      if (p.terms && p.terms.trim() !== "") {
+        document.getElementById("termsContainer").style.display = "block";
+        document.getElementById("dispTermsText").innerText = p.terms;
+      } else {
+        document.getElementById("termsContainer").style.display = "none";
+      }
+    }
+
+    function saveSettings() {
+      const p = {
+        name: document.getElementById("editCompName").value,
+        gst: document.getElementById("editGst").value,
+        mob: document.getElementById("editMob").value,
+        tagline: document.getElementById("editTagline").value,
+        address: document.getElementById("editAddress").value,
+        terms: document.getElementById("editTerms").value
+      };
+      localStorage.setItem("deepa_quote_profile", JSON.stringify(p));
+      loadCompanyProfile();
+      closeSettingsModal();
+    }
+
+    function openSettingsModal() {
+      document.getElementById("settingsModal").style.display = "flex";
+    }
+    function closeSettingsModal() {
+      document.getElementById("settingsModal").style.display = "none";
+    }
+
+    // Set today's date
+    function initDate() {
+      const today = new Date();
+      const dd = String(today.getDate()).padStart(2, '0');
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const yyyy = today.getFullYear();
+      document.getElementById("quoteDate").value = `${dd}/${mm}/${yyyy}`;
+    }
+
+    // Auto grow textarea function
+    function autoGrow(el) {
+      if (!el) return;
+      el.style.height = "auto";
+      el.style.height = (el.scrollHeight) + "px";
+    }
+
+    // Render Rows
+    function renderRows() {
+      const tbody = document.getElementById("itemsBody");
+      tbody.innerHTML = "";
+
+      let currentSr = 0;
+
+      items.forEach((item, index) => {
+        const tr = document.createElement("tr");
+
+        if (item.isMerged) {
+          tr.className = "merged-space-row";
+          tr.innerHTML = `
+            <td colspan="7" style="background: #ffffff; padding: 4px 8px; border: 1px solid #000000; height: 26px;">
+              <input type="text" class="tbl-input" style="width: 100%; font-weight: 700; text-align: left;" 
+                     placeholder="[Empty Space Row - Type note/title or leave blank for space]" 
+                     value="${item.particular || ''}" 
+                     oninput="updateItem(${index}, 'particular', this.value)">
+            </td>
+            <td class="col-action no-print" style="border: 1px solid #000000; text-align: center;">
+              <button class="btn btn-danger" onclick="deleteRow(${index})" title="Delete space row">✕</button>
+            </td>
+          `;
+        } else {
+          currentSr++;
+          tr.innerHTML = `
+            <td class="col-sr font-bold">${currentSr}</td>
+            <td class="col-part" colspan="3">
+              <textarea class="tbl-input auto-expand" rows="1" 
+                        placeholder="Enter item description..." 
+                        oninput="autoGrow(this); updateItem(${index}, 'particular', this.value)">${item.particular}</textarea>
+            </td>
+            <td class="col-qty">
+              <input type="text" class="tbl-input text-center" value="${item.qty}" 
+                     placeholder="" 
+                     oninput="updateItem(${index}, 'qty', this.value)">
+            </td>
+            <td class="col-rate">
+              <input type="text" class="tbl-input text-right" value="${item.rate}" 
+                     placeholder="Rate" 
+                     oninput="updateItem(${index}, 'rate', this.value)">
+            </td>
+            <td class="col-amt">
+              <input type="text" class="tbl-input text-right font-bold" id="amt_${index}" value="${item.amt}" 
+                     placeholder="" 
+                     oninput="updateItem(${index}, 'amt', this.value)">
+            </td>
+            <td class="col-action no-print">
+              <button class="btn btn-danger" onclick="deleteRow(${index})" title="Delete row">✕</button>
+            </td>
+          `;
+        }
+        tbody.appendChild(tr);
+      });
+
+      // Adjust heights for loaded items
+      setTimeout(() => {
+        document.querySelectorAll("textarea.auto-expand").forEach(autoGrow);
+      }, 20);
+    }
+
+    function addRow() {
+      items.push({ particular: "", qty: "1", rate: "", amt: "" });
+      renderRows();
+      setTimeout(() => {
+        const textareas = document.querySelectorAll("#itemsBody tr:last-child textarea");
+        if (textareas.length > 0) textareas[0].focus();
+      }, 50);
+    }
+
+    function addMergedSpaceRow() {
+      items.push({ isMerged: true, particular: "", qty: "", rate: "", amt: "" });
+      renderRows();
+      setTimeout(() => {
+        const inputs = document.querySelectorAll("#itemsBody tr:last-child input");
+        if (inputs.length > 0) inputs[0].focus();
+      }, 50);
+    }
+
+    function deleteRow(index) {
+      if (items.length <= 1) {
+        items = [{ particular: "", qty: "", rate: "", amt: "" }];
+      } else {
+        items.splice(index, 1);
+      }
+      renderRows();
+    }
+
+    function updateItem(index, key, val) {
+      items[index][key] = val;
+      
+      // Auto-calculate Amount if user enters numeric Qty and Rate
+      if (key === 'qty' || key === 'rate') {
+        const q = parseFloat(items[index].qty);
+        const r = parseFloat(items[index].rate);
+        if (!isNaN(q) && !isNaN(r) && q > 0 && r > 0) {
+          items[index].amt = (q * r).toFixed(2);
+          const amtInput = document.getElementById(`amt_${index}`);
+          if (amtInput) amtInput.value = items[index].amt;
+        } else if (items[index].amt === "") {
+          const amtInput = document.getElementById(`amt_${index}`);
+          if (amtInput) amtInput.value = "";
+        }
+      }
+    }
+
+    // Export to Excel function (.xlsx)
+    function exportToExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert("Excel export library load ho rahi hai, kripya 2 second baad dobara try karein.");
+        return;
+      }
+
+      const compName = document.getElementById("dispCompName").innerText.trim();
+      const gst = document.getElementById("dispGst").innerText.trim();
+      const mob = document.getElementById("dispMob").innerText.trim();
+      const tagline = document.getElementById("dispTagline").innerText.trim();
+      const address = document.getElementById("dispAddress").innerText.trim();
+      const client = document.getElementById("clientName").value.trim();
+      const date = document.getElementById("quoteDate").value.trim();
+
+      const ws_data = [
+        ["GSTIN: " + gst, "", compName, "", "", "DATE: " + date],
+        ["MOB NO: " + mob, "", "", "", "", ""],
+        [tagline, "", "", "", "", ""]
+      ];
+
+      if (address && address.trim() !== "") {
+        ws_data.push([address, "", "", "", "", ""]);
+      }
+
+      ws_data.push(["TO: " + client, "", "", "", "", ""]);
+      ws_data.push([]);
+      ws_data.push(["SR.NO", "PARTICULARS", "Qty/Kg/\"/mtr", "Rate", "Amount"]);
+
+      let sr = 0;
+      items.forEach((it, idx) => {
+        if (it.isMerged) {
+          ws_data.push([
+            it.particular || "", "", "", "", ""
+          ]);
+        } else {
+          sr++;
+          ws_data.push([
+            sr,
+            it.particular,
+            it.qty,
+            it.rate,
+            it.amt
+          ]);
+        }
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet(ws_data);
+      XLSX.utils.book_append_sheet(wb, ws, "Quotation");
+      XLSX.writeFile(wb, `Quotation_${compName}_${date.replace(/\//g, '-') || 'QT'}.xlsx`);
+    }
+
+    // Initialize
+    window.onload = function() {
+      loadCompanyProfile();
+      initDate();
+      renderRows();
+      window.addEventListener('beforeprint', () => {
+        document.querySelectorAll("textarea.auto-expand").forEach(autoGrow);
+      });
+      window.addEventListener('resize', () => {
+        document.querySelectorAll("textarea.auto-expand").forEach(autoGrow);
+      });
+    };
+  </script>
+</body>
+</html>
