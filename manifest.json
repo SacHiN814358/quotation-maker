@@ -1,6 +1,6 @@
 {
-  "name": "Deepa Engineering Quotation Maker",
-  "short_name": "Deepa Quote",
+  "name": "Quotation Maker",
+  "short_name": "Quotation Maker",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f1f5f9",
