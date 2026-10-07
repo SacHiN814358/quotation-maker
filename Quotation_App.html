@@ -783,6 +783,9 @@
       window.addEventListener('resize', () => {
         document.querySelectorAll("textarea.auto-expand").forEach(autoGrow);
       });
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration error', err));
+      }
     };
   </script>
 </body>
